@@ -52,7 +52,7 @@ u = 1*ones(1,nSamples-1);
 
 x(:,1)=x0; % array whose evolution is in time
 for i=1:nSamples-1
-    x(:,i+1)=Ad*x(:,i)+Bd*u(:,i);
+    x(:,i+1)=Ad*x(:,i);
 end
 
 figure(1);
@@ -62,14 +62,12 @@ title('System under autonomous behavior');
 subplot(2,1,2);
 plot(t,x(2,:));
 
-% E' giusto che il grafico sia cosi?
-
 %% 4)	Apply a LQT to make the state track a given function
 
 Q = [1000 0
      0 0.0001];
 Qf = Q; % cost of the state
-R = 0.01; % cost of the control
+R = 1; % cost of the control
 
 horizon = 200;
 sampleTime = 1;
@@ -94,8 +92,6 @@ for i=1:N
     %optimal state for LQT to track z
     x(:,i+1)=Ad*x(:,i)+Bd*u(:,i);
 end
-
-% Viene trackata correttamente?
 
 figure(2);
 subplot(3,1,1);
@@ -128,8 +124,6 @@ ylabel('Cooling rate');
 
 %% 5)	Show examples with noise on the system, and on the measure of the state, 
 %       also taken into account an output y=Cx where C may also be a singular matrix or rectangular.
-
-% Vanno bene i valori?
 
 mucsi = [0 0]; % mean noise of input
 Qv = [0.1 0
