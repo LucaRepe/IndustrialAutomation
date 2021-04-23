@@ -62,7 +62,6 @@ for i=1:N
     
 end
 
-figure(3);
 subplot(3,1,1);
 plot(t(1:N+1),x(1,:));
 hold on;

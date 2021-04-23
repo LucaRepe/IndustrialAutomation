@@ -37,9 +37,9 @@ Kd=600;
 % Kp=-80;
 % Ki=1;
 % Kd=6;
+
 previousError = 0;
 integral = 0;
-
 for i=1:nSamples-1
 %example of PID control on the temperature without noise
   error = x_track(:,i) - x(1,i);

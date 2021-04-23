@@ -46,7 +46,6 @@ for i=1:N
     x(:,i+1)=Ad*x(:,i)+Bd*u(:,i);
 end
 
-figure(2);
 subplot(3,1,1);
 plot(t(1:N+1),x(1,:));
 hold on;
