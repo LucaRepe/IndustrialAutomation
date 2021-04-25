@@ -12,11 +12,11 @@ Bc = [0
 C = eye(2);
 D = zeros(2,1);
 
-sampleTime=0.03704;
-horizon=25;
+sampleTime=0.1;
+horizon=100;
 
-x0=[0
-    0];
+x0=[10
+    -2];
 sysc = ss(Ac,Bc,C,D);
 sysd=c2d(sysc,sampleTime);
 Ad=sysd.A;
@@ -24,8 +24,9 @@ Bd=sysd.B;
 
 t=0:sampleTime:horizon;
 nSamples=length(t);
+N = length(t)-1;
 
-x_track=sin(t);
+x_track=sin(t).*ones(1,nSamples);
 x(:,1)=x0;
 
 %track x1
@@ -41,7 +42,7 @@ Kd=600;
 previousError = 0;
 integral = 0;
 for i=1:nSamples-1
-%example of PID control on the temperature without noise
+%example of PID control on the temperature
   error = x_track(:,i) - x(1,i);
   integral = integral + error*sampleTime;
   derivative = (error - previousError)/sampleTime;
@@ -58,9 +59,9 @@ plot(t,x(1,:));
 hold on;
 plot(t,x_track(1,:));
 hold off;
-title('first state component noise');
-legend('state','signal');
+title('First state component noise');
+legend('State','Signal');
 
 subplot(2,1,2);
 plot(t(1:end-1),u(1,:));
-title('control');
+title('Control');

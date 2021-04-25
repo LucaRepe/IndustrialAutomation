@@ -43,12 +43,11 @@ end
 
 %% 3)	Simulate the system under autonomous behavior
 
-x0 = [1
-      1]; % initial state
+x0 = [10
+      -2]; % initial state
 horizon = 100; % time where the simulation stops
 t = 0:sampleTime:horizon; % starts at 0, computes at every sample time and arrives at horizon
 nSamples = length(t); % calculated from the length of t
-u = 1*ones(1,nSamples-1);
 
 x(:,1)=x0; % array whose evolution is in time
 for i=1:nSamples-1
@@ -57,6 +56,7 @@ end
 
 subplot(2,1,1);
 plot(t,x(1,:));
-title('System under autonomous behavior');
+title('System under autonomous behavior', 'State1');
 subplot(2,1,2);
 plot(t,x(2,:));
+title('State2');
