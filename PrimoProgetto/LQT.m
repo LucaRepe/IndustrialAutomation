@@ -18,11 +18,11 @@ Ad = sysd.A;
 Bd = sysd.B;
 
 Q = [1000 0
-     0 0.0001];
+     0 0.001];
 Qf = Q; % cost of the state
 R = 0.01; % cost of the control
 
-horizon = 200;
+horizon = 100;
 sampleTime = 1;
 t = 0:sampleTime:horizon;
 N = length(t)-1;
@@ -52,7 +52,7 @@ hold on;
 plot(t(1:N+1),z(1,:));
 hold off;
 title('LQT','State1');
-legend('z1','x1');
+legend('x1','z1');
 xlabel('Time');
 ylabel('Reaction');
 
@@ -62,7 +62,7 @@ hold on;
 plot(t(1:N+1),z(2,:));
 hold off;
 title('State2');
-legend('z2','x2');
+legend('x2','z2');
 xlabel('Time');
 ylabel('Temperature');
 

@@ -11,7 +11,7 @@ Bc = [0
 C = eye(2);
 D = zeros(2, 1);
 
-horizon = 200;
+horizon = 100;
 sampleTime = 1;
 t = 0:sampleTime:horizon;
 N = length(t)-1;
@@ -23,7 +23,7 @@ Bd = sysd.B;
 
 Q = [1000 0
      0 0.0001];
-Qf = Q; % cost of the state
+Qf = Q; % cost of the state (state at the very last instant)
 R = 0.01; % cost of the control
 
 mucsi = [0 0]; % mean noise of input
@@ -53,7 +53,6 @@ mu(:,1) = mu0;
 for i=1:N
     %optimal control
     u(:,i) = -K(:,:,i)*mu(:,i);
-    %u(:,i)=0;
     %optimal state for LQT to track z
     x(:,i+1) = Ad*x(:,i)+Bd*u(:,i)+csi(:,i);
     y(:,i+1) = C*x(:,i+1)+eta(:,i+1);
