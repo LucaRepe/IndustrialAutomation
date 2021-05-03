@@ -1,3 +1,3 @@
-# IndustrialAutomationFirstProject
+# IndustrialAutomation2021
 
-#### Repository for the First Project of Industrial Automation
+#### Repository for the Projects of Industrial Automation
