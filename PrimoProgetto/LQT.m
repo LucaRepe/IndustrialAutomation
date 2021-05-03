@@ -27,31 +27,35 @@ sampleTime = 1;
 t = 0:sampleTime:horizon;
 N = length(t)-1;
 
+% P and K matrices obtained from Riccati equation
 [P, K] = pk_riccati_output(Ad,Bd,C,Q,Qf,R,N);
-[Kinf,Pinf,e] = lqr(sysd,Q,R); % A cosa ci serve?
-% z = [4*ones(N+1,1)'
-%    -1*ones(N+1,1)'];
+
+% Function to track
 z = [4*sin(1:N+1)
     -1*sin(1:N+1)];
+
+% G and LG matrices 
 [g, Lg] = Lg_xLQT(Ad,Bd,C,Q,Qf,R,N,P,z);
 
 x0 = [-10 13]';
 x(:,1) = x0;
+u = zeros(1,N-1);
 
-%STEP 3 and 4;
 for i=1:N
-    %optimal control
+    % Optimal control
     u(:,i)=-K(:,:,i)*x(:,i)+Lg(:,:,i)*g(:,:,i+1);
-    %optimal state for LQT to track z
+    % Optimal state for LQT to track z
     x(:,i+1)=Ad*x(:,i)+Bd*u(:,i);
 end
+
+% Plot of the tracking
 
 subplot(3,1,1);
 plot(t(1:N+1),x(1,:));
 hold on;
 plot(t(1:N+1),z(1,:));
 hold off;
-title('LQT','State1');
+title('State1');
 legend('x1','z1');
 xlabel('Time');
 ylabel('Reaction');

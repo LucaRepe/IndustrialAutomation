@@ -25,7 +25,9 @@ Bd=sysd.B;
 t=0:sampleTime:horizon;
 nSamples=length(t);
 N = length(t)-1;
+u=zeros(1,nSamples-1);
 
+% Signal to track
 x_track=4*sin(t);
 x(:,1)=x0;
 
@@ -43,7 +45,7 @@ Kd=559;
 previousError = 0;
 integral = 0;
 for i=1:nSamples-1
-% Example of PID control on the temperature
+% PID control
   error = x_track(:,i) - x(1,i);
   integral = integral + error*sampleTime;
   derivative = (error - previousError)/sampleTime;
@@ -66,3 +68,4 @@ legend('State','Signal');
 subplot(2,1,2);
 plot(t(1:end-1),u(1,:));
 title('Control');
+legend('u');

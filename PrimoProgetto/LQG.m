@@ -23,8 +23,10 @@ Bd = sysd.B;
 
 Q = [1000 0
      0 0.0001];
-Qf = Q; % cost of the state (state at the very last instant)
+Qf = Q; % cost of the state
 R = 0.01; % cost of the control
+u = zeros(1,N-1);
+y = zeros(1,N-1);
 
 mucsi = [0 0]; % mean noise of input
 Qv = [0.1 0
@@ -38,10 +40,13 @@ eta = mvnrnd(mueta,Rv,N+1)'; % generates random output noise
 % C = 10;
 C = [1 0];
 
+% P and K matrices obtaines from the Riccati equation
 [P, K] = p_riccati(Ad, Bd, Q, Qf, R, N);
 alfa = [0 0]'; % mean initial state
 sigma0 = [1 0
           0 1]; % covariance initial state
+      
+% K matrix obtained from this function
 [Kkalman] = mykalman(Ad,C,Qv,Rv,alfa,sigma0,N);
 x0 = [1 1]';
 y0 = C*x0+eta(:,1);
@@ -61,12 +66,14 @@ for i=1:N
     
 end
 
+% Plot of the Kalman estimation
+
 subplot(3,1,1);
 plot(t(1:N+1),x(1,:));
 hold on;
 plot(t(1:N+1),mu(1,:));
 hold off;
-title('LQG','State1');
+title('State1');
 legend('Actual','Kalman estimation');
 xlabel('Time');
 ylabel('Reaction');

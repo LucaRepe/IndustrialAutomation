@@ -45,18 +45,18 @@ end
 
 x0 = [10
       -2]; % initial state
-horizon = 100; % time where the simulation stops
+horizon = 100; % instant where the simulation stops
 t = 0:sampleTime:horizon; % starts at 0, computes at every sample time and arrives at horizon
 nSamples = length(t); % calculated from the length of t
 
-x(:,1)=x0; % array whose evolution is in time
+x(:,1)=x0; 
 for i=1:nSamples-1
     x(:,i+1)=Ad*x(:,i);
 end
 
 subplot(2,1,1);
 plot(t,x(1,:));
-title('System under autonomous behavior', 'State1');
+title('State1');
 subplot(2,1,2);
 plot(t,x(2,:));
 title('State2');
