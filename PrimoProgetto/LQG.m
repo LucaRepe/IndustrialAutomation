@@ -7,8 +7,8 @@ clc;
 Ac = [-0.1 -0.12
     -0.3 -0.012];
 Bc = [0 
-    -0.07];
-C = eye(2);
+    -0.07]; 
+C = eye(2); 
 D = zeros(2, 1);
 
 horizon = 100;
@@ -26,7 +26,7 @@ Q = [1000 0
 Qf = Q; % cost of the state
 R = 0.01; % cost of the control
 u = zeros(1,N-1);
-y = zeros(1,N-1);
+%y = zeros(1,N-1);
 
 mucsi = [0 0]; % mean noise of input
 Qv = [0.1 0
@@ -37,8 +37,7 @@ rng default  % For reproducibility
 csi = mvnrnd(mucsi,Qv,N)'; % generates random input noise
 eta = mvnrnd(mueta,Rv,N+1)'; % generates random output noise
 
-% C = 10;
-C = [1 0];
+% C = [10 1];
 
 % P and K matrices obtaines from the Riccati equation
 [P, K] = p_riccati(Ad, Bd, Q, Qf, R, N);

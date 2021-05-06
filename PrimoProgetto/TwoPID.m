@@ -28,8 +28,8 @@ N = length(t)-1;
 u1=zeros(1,nSamples-1);
 u2=zeros(1,nSamples-1);
 
-x1_track=4*sin(t);
-x2_track=2*sin(t);
+x1_track=50*sin(t+20)+10;
+x2_track=400*sin(t+50);
 
 x(:,1)=x0;
 
@@ -39,23 +39,37 @@ rng default  % for reproducibility
 mucsi = [0 0]; % mean noise of input
 csi = mvnrnd(mucsi,Qv,N)'; % generates random input noise
 
-% % Values for the first PID, obtained tuning the PID in Simulink
-Kp=390;
-Ki=15;
-Kd=559;
+% Values for the first PID, obtained tuning the PID in Simulink
+
+Kp = 2628.54740453048;
+Ki = 19066.7584084496;
+Kd = 0;
+
+% Values for the second PID, obtained tuning the PID in Simulink
+
+Kp2 = -128.478349079916;
+Ki2 = -688.977103325722;
+Kd2 = -0.850264599796858;
 
 previousError = 0;
+previousError2 = 0;
 integral = 0;
+integral2 = 0;
 for i=1:nSamples-1
 % PID control
   error = x1_track(:,i) - x(1,i);
+  error2 = x2_track(:,i) - x(2,i);
   integral = integral + error*sampleTime;
+  integral2 = integral2 + error2*sampleTime;
   derivative = (error - previousError)/sampleTime;
+  derivative2 = (error2 - previousError2)/sampleTime;
   u1(:,i) = Kp*error + Ki*integral + Kd*derivative;
+  u2(:,i) = Kp2*error2 + Ki2*integral2 + Kd2*derivative2;
   previousError = error;
+  previousError2 = error2;
   
   % Evolution of the system
-  x(:,i+1)=Ad*x(:,i)+Bd*u1(:,i)+csi(:,i);
+  x(:,i+1)=Ad*x(:,i)+Bd*(u1(:,i)+u2(:,i))+csi(:,i);
 end
 
 % Plotting the first PID
@@ -72,27 +86,6 @@ subplot(4,1,2);
 plot(t(1:end-1),u1(1,:));
 title('Control1');
 legend('u1');
-
-
-% Second PID in parallel
-
-Kp=-128;
-Ki=-688;
-Kd=-0.85;
-
-previousError = 0;
-integral = 0;
-for i=1:nSamples-1
-% PID control
-  error = x2_track(:,i) - x(2,i);
-  integral = integral + error*sampleTime;
-  derivative = (error - previousError)/sampleTime;
-  u2(:,i) = Kp*error + Ki*integral + Kd*derivative;
-  previousError = error;
-  
-  % Evolution of the system
-  x(:,i+1)=Ad*x(:,i)+Bd*u2(:,i)+csi(:,i);
-end
 
 % Plotting the second PID
 

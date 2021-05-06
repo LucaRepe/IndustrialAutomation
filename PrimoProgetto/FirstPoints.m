@@ -54,9 +54,13 @@ for i=1:nSamples-1
     x(:,i+1)=Ad*x(:,i);
 end
 
+% Plotting the autonomous behavior
+
 subplot(2,1,1);
 plot(t,x(1,:));
 title('State1');
+legend('x1');
 subplot(2,1,2);
 plot(t,x(2,:));
 title('State2');
+legend('x2');

@@ -29,6 +29,7 @@ u=zeros(1,nSamples-1);
 
 % Signal to track
 x_track=4*sin(t);
+
 x(:,1)=x0;
 
 Qv = [0.1 0
