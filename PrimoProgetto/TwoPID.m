@@ -74,7 +74,7 @@ end
 
 % Plotting the first PID
 
-subplot(4,1,1);
+subplot(3,1,1);
 plot(t,x(1,:));
 hold on;
 plot(t,x1_track(1,:));
@@ -82,14 +82,9 @@ hold off;
 title('State1');
 legend('State','Signal');
 
-subplot(4,1,2);
-plot(t(1:end-1),u1(1,:));
-title('Control1');
-legend('u1');
-
 % Plotting the second PID
 
-subplot(4,1,3);
+subplot(3,1,2);
 plot(t,x(2,:));
 hold on;
 plot(t,x2_track(1,:));
@@ -97,7 +92,9 @@ hold off;
 title('State2');
 legend('State','Signal');
 
-subplot(4,1,4);
-plot(t(1:end-1),u2(1,:));
-title('Control2');
-legend('u2');
+% Plotting the control
+
+subplot(3,1,3);
+plot(t(1:end-1),(u1(1,:)+u2(1,:)));
+title('Control');
+legend('u1+u2');
