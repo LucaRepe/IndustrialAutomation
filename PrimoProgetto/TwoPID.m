@@ -12,26 +12,26 @@ Bc = [0
 C = eye(2);
 D = zeros(2,1);
 
-sampleTime=0.1;
-horizon=100;
+sampleTime = 0.1;
+horizon = 100;
 
-x0=[10
-    -2];
+x0 = [10
+     -2];
 sysc = ss(Ac,Bc,C,D);
-sysd=c2d(sysc,sampleTime);
-Ad=sysd.A;
-Bd=sysd.B;
+sysd = c2d(sysc,sampleTime);
+Ad = sysd.A;
+Bd = sysd.B;
 
-t=0:sampleTime:horizon;
-nSamples=length(t);
+t = 0:sampleTime:horizon;
+nSamples = length(t);
 N = length(t)-1;
-u1=zeros(1,nSamples-1);
-u2=zeros(1,nSamples-1);
+u1 = zeros(1,nSamples-1);
+u2 = zeros(1,nSamples-1);
 
-x1_track=50*sin(t+20)+10;
-x2_track=400*sin(t+50);
+x1_track = 50*sin(t+20)+10;
+x2_track = 400*sin(t+50);
 
-x(:,1)=x0;
+x(:,1) = x0;
 
 Qv = [0.1 0
       0 0.1]; % covariance noise of input
@@ -69,7 +69,7 @@ for i=1:nSamples-1
   previousError2 = error2;
   
   % Evolution of the system
-  x(:,i+1)=Ad*x(:,i)+Bd*(u1(:,i)+u2(:,i))+csi(:,i);
+  x(:,i+1) = Ad*x(:,i) + Bd*(u1(:,i)+u2(:,i)) + csi(:,i);
 end
 
 % Plotting the first PID

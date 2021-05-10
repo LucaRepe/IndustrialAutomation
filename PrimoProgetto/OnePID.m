@@ -12,23 +12,23 @@ Bc = [0
 C = eye(2);
 D = zeros(2,1);
 
-sampleTime=0.1;
-horizon=100;
+sampleTime = 0.1;
+horizon = 100;
 
-x0=[10
-    -2];
+x0 = [10
+     -2];
 sysc = ss(Ac,Bc,C,D);
-sysd=c2d(sysc,sampleTime);
-Ad=sysd.A;
-Bd=sysd.B;
+sysd = c2d(sysc,sampleTime);
+Ad = sysd.A;
+Bd = sysd.B;
 
-t=0:sampleTime:horizon;
-nSamples=length(t);
+t = 0:sampleTime:horizon;
+nSamples = length(t);
 N = length(t)-1;
-u=zeros(1,nSamples-1);
+u = zeros(1,nSamples-1);
 
 % Signal to track
-x_track=4*sin(t);
+x_track = 4*sin(t);
 
 x(:,1)=x0;
 
@@ -39,9 +39,9 @@ mucsi = [0 0]; % mean noise of input
 csi = mvnrnd(mucsi,Qv,N)'; % generates random input noise
 
 % Values for PID, obtained tuning the PID in Simulink
-Kp=390;
-Ki=15;
-Kd=559;
+Kp = 390.903319299959;
+Ki = 15.6264714940841;
+Kd = 559.239782620277;
 
 previousError = 0;
 integral = 0;
@@ -54,7 +54,7 @@ for i=1:nSamples-1
   previousError = error;
   
   % Evolution of the system
-  x(:,i+1)=Ad*x(:,i)+Bd*u(:,i)+csi(:,i);
+  x(:,i+1) = Ad*x(:,i) + Bd*u(:,i) + csi(:,i);
 end
 
 % Plotting simulation

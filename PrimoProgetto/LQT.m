@@ -3,6 +3,8 @@ clc;
 
 %% 4)	Apply a LQT to make the state track a given function
 
+% Continuous time system
+
 Ac = [-0.1 -0.12
     -0.3 -0.012];
 Bc = [0 
@@ -43,9 +45,9 @@ u = zeros(1,N-1);
 
 for i=1:N
     % Optimal control
-    u(:,i)=-K(:,:,i)*x(:,i)+Lg(:,:,i)*g(:,:,i+1);
+    u(:,i)=-K(:,:,i)*x(:,i) + Lg(:,:,i)*g(:,:,i+1);
     % Optimal state for LQT to track z
-    x(:,i+1)=Ad*x(:,i)+Bd*u(:,i);
+    x(:,i+1)=Ad*x(:,i) + Bd*u(:,i);
 end
 
 % Plot of the tracking
