@@ -1,47 +1,39 @@
 clear all;
 clc;
 
-%% 5)	Show examples with noise on the system, and on the measure of the state, 
-%       also taken into account an output y=Cx where C may also be a singular matrix or rectangular.
+%% 4)	Apply a LQT to make the state track a given function
 
 % Continuous time system
 
-Ac = [-0.1 -0.12
-    -0.3 -0.012];
-Bc = [0 
-    -0.07];  
+Ac = [-0.1 0 0
+    0 -0.1 0
+    -0.1 0 1];
+Bc = [1 0 
+    2 0
+    0 1];
+C = eye(3);
+D = zeros(3, 2);
 
-% C as a singular matrix
-% C = [3 6
-%      1 2];
-% D = zeros(2, 1);
-
-% C as a rectangular matrix
-C = [10 1];
-D = zeros(1, 1);
-
-
-horizon = 100;
-sampleTime = 0.1;
-t = 0:sampleTime:horizon;
-N = length(t)-1;
+sampleTime = 1;
 sysc = ss(Ac,Bc,C,D);
 sysd = c2d(sysc,sampleTime);
 
 Ad = sysd.A;
 Bd = sysd.B;
 
-Q = [1000 0
-     0 0.0001];
+Q = eye(3);
 Qf = Q; % cost of the state
 R = 0.01; % cost of the control
-u = zeros(1,N-1);
-y = zeros(1,N-1); % y when C is rectangular
-% y = zeros(2,N-1); % y when C is singular
 
-mucsi = [0 0]; % mean noise of input
-Qv = [0.1 0
-      0 0.1]; % covariance noise of input
+horizon = 100;
+sampleTime = 1;
+t = 0:sampleTime:horizon;
+N = length(t)-1;
+
+mucsi = [0 0 0]; % mean noise of input
+Qv = [0.1 0 0
+      0 0.1 0
+      0 0 0.1]; % covariance noise of input
 mueta = 0; % mean noise of output
 Rv = 0.1; % covariance noise of output
 rng default  % For reproducibility
@@ -50,15 +42,17 @@ eta = mvnrnd(mueta,Rv,N+1)'; % generates random output noise
 
 % P and K matrices obtained from the Riccati equation
 [P, K] = p_riccati(Ad, Bd, Q, Qf, R, N);
-alfa = [0 0]'; % mean initial state
-sigma0 = [1 0
-          0 1]; % covariance initial state
+alfa = [0 0 0]'; % mean initial state
+sigma0 = [1 0 0
+          0 1 0
+          0 0 1]; % covariance initial state
       
-% K of Kalman matrix obtained from this function
+% K matrix obtained from this function
 [Kkalman] = mykalman(Ad,C,Qv,Rv,alfa,sigma0,N);
-x0 = [10 -2]';
+x0 = [10 -2 5]';
 y0 = C*x0+eta(:,1);
-mu0 = alfa+Kkalman(:,:,1)*(y0-C*alfa);
+mu0 = alfa+Kkalman(:,:,1)*(y0-C*alfa); % squeeze removes dimensions of length 1
+
 x(:,1) = x0;
 mu(:,1) = mu0;
 

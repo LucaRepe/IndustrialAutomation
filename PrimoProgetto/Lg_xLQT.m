@@ -1,10 +1,10 @@
-%function to compute p riccati matrix and k control matrix for LQR
-%A,B matrixes of linear state dynamics, 
-%Q, Qf cost of the state; R cost of the control;
-%N number of time intervals; N+1 samples
+% Function to compute p riccati matrix and k control matrix for LQR
+% A,B matrixes of linear state dynamics, 
+% Q, Qf cost of the state; R cost of the control;
+% N number of time intervals; N+1 samples
 
 function  [g, Lg] = Lg_xLQT(Ad,Bd,C,Q,Qf,R,N,P,z)
-    %z is the vector to be tracked length N+1, dimension is the one y
+    % Z is the vector to be tracked length N+1, dimension is the one y
     W = C'*Q;
     E = Bd*inv(R)*Bd';
 

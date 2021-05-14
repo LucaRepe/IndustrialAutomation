@@ -45,8 +45,8 @@ end
 
 x0 = [10
       -2]; % initial state
-horizon = 100; % instant where the simulation stops
-t = 0:sampleTime:horizon; % starts at 0, computes at every sample time and arrives at horizon
+horizon = 100; % instant where the simulation arives
+t = 0:sampleTime:horizon; % starts at 0, computes every sample time and arrives at horizon
 nSamples = length(t); % calculated from the length of t
 
 x(:,1)=x0; 
