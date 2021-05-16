@@ -18,7 +18,7 @@ x0=[10
     -2];
 x(:,1)=x0;
 SYS=ss(A,B,eye(2),zeros(1));
-sysd = c2d(SYS,0.1);
+sysd = c2d(SYS,sampleTime);
 
 Ad = sysd.A;
 Bd = sysd.B;
