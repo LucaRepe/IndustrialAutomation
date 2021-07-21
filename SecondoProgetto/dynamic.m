@@ -1,5 +1,7 @@
-clear all;
+clear;
 clc;
+
+%% Parameters
 
 % Defining the jobs
 J = [1 2 3 4 5 6 7 8 9 10]';
@@ -23,10 +25,72 @@ N = length(J);
 X0 = 0;
 X{N} = zeros(N);
 
-% Cell array with all the possible state in the stages
+% Cell array with all the possible states in the stages
 for i = 1:N   
     X{i} = nchoosek(1:N,i);
 end
+
+%% Pruning
+
+% Pruning the first stage
+
+% Loop on the columns of the precendeces matrix
+% If the state has value of 0 it has no precedences
+j=1;
+for i=1:length(X{1}(:,1))
+    if sum(precedences(:,i)) == 0
+        Y{1}(j,:) = X{1}(i,:);
+        j = j+1;
+    end 
+end
+
+% Pruning the other stages
+% I have to check if each state is reachable from the previous state,
+% if it's reachable I have to verify that respects the contraints,
+% if it's verified then is admissible.
+
+% Loop to prune the other stages
+Y{N} = zeros(N);
+for c=2:N
+    j=1;
+    % Loop with all the possible states in the c-th stage
+    for i=1:length(X{c}(:,1))
+        count = 0;
+        % Loop with the states in the previous stage
+        for k=1:length(Y{c-1}(:,1))
+            % If at least one state from the previous stage has distance
+            % one from the state of the actual stage, then the state is 
+            % admissible if the preceding constraints are satisfied
+            if size(setdiff(X{c}(i,:),Y{c-1}(k,:)))==1
+                count = count + 1;
+            end 
+        end
+        % Check if this state satisfies the constraints
+        if count > 0
+            count = 0;
+            % Loop on the jobs computed by the state i in the stage c
+            for a=1:length(X{c}(i,:))
+                % Loop on the rows of the precedences matrix
+                for b=1:length(precedences(1,:))
+                    if precedences(b,X{c}(i,a)) ~= 0
+                        % There is a preceding constraint on this job,
+                        % I have to control if the job that has to be 
+                        % executed before has been executed in the state
+                        if (~ismember(b,X{c}(i,:)))
+                            count = count + 1;
+                        end
+                    end
+                end
+            end
+            if count == 0 % Then it is admissible
+                Y{c}(j,:) = X{c}(i,:);
+                j = j+1;
+            end
+        end
+    end % End loop on the states of stage c
+end
+
+X = Y;
 
 %% Backward phase
 
@@ -47,38 +111,58 @@ for k=N-1:-1:1
                 G{k}(i,j)=Go{k+1}(j)+tardiness{k}(i,j); % add the tardiness to the previous cost
             end
         end
-        % add the storage of the optimal control
-        [Go{k}(i),position(k,i)]=min(G{k}(i,:)); % update the cost matrix
-        %control_o(k,i) = control(i, position(k,i));
+        Go{k}(i)=min(G{k}(i,:)); % update the cost matrix
     end
 end
 
 % Step 0
-for i=1:N
+G0 = zeros(1,length(X{1}));
+for i=1:length(X{1})
     G0(i)=Go{1}(i)+max((P(X{1}(i))-D(X{1}(i))), 0);
 end
 
-[Go0, idx]=min(G0); % add the storage of the optimal control
-path{1} = X{1}(idx, :);
+[Go0, index]=min(G0); % add the storage of the optimal control
+path{1} = X{1}(index, :); % cell of list of execution
 
 %% Forward phase
 
-for i = 2:N
-    [out, idx] = min(Go{i});
-    path{i} = X{i}(idx, :);
+path{N} = zeros(N);
+for i=2:N
+    [value, index] = min(Go{i});
+    path{i} = X{i}(index, :);
 end
 
-scheduled = [0 0 0 0 0 0 0 0 0 0]';
+scheduled = zeros(N,1);
 for i=N:-1:2
     scheduled(i) = setdiff(path{i}, path{i-1});
 end
 scheduled(1) = path{1};
-
-
-%[cost, tadiness, completionTime] = 
 
 %% Gantt chart
 
 clf;
 close all;
 
+% Creation of the matrix that we're going to
+% plot in the Gantt chart
+ganttMatrix = zeros(N,1);
+for i = 1:length(P)
+    ganttMatrix(i) = P(scheduled(i));
+end
+H = barh(1,ganttMatrix,'stacked');
+% Display every second in the X axis
+set(gca,'xtick',[0 1:1:60]);
+% Vertical lines
+for i = 1:sum(P)
+    xline(i,':k');
+end
+if N > 6
+    H(8).FaceColor = 'g';
+    H(9).FaceColor = 'y';
+    H(10).FaceColor = 'b';
+end
+title('Gantt chart');
+xlabel('Processing time');
+ylabel('Job schedule');
+legendStrings = "J" + string(scheduled);
+legend(legendStrings,'Orientation','horizontal');
