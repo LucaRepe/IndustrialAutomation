@@ -164,16 +164,16 @@ xticks(0:1:sum(P));
 % Display red or blue lines corresponding to the due dates
 for i=1:length(D)
     if scheduled(i) == 4 || scheduled(i) == 6
-        xl = xline(D(scheduled(i)),'--r',"D4 & D6" + string());
+        xl = xline(D(scheduled(i)),'--r',"D4 & D6");
         xl.LabelHorizontalAlignment = 'left';
         continue;
     end
     if scheduled(i) == 9 || scheduled(i) == 10
-        if completionTime(i) > D(scheduled(i))
-            xl = xline(D(scheduled(i)),'--r',"D9 & D10" + string());
-            xl.LabelHorizontalAlignment = 'left'; % green
-            continue;
-        end
+        xl = xline(D(scheduled(i)),'--b',"D9 & " + "       ");
+        xl.LabelHorizontalAlignment = 'left';
+        xl = xline(D(scheduled(i)),'--r',"D10");
+        xl.LabelHorizontalAlignment = 'left';
+        continue;
     end
     if completionTime(i) > D(scheduled(i))
         xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)));
@@ -185,6 +185,7 @@ for i=1:length(D)
 end
 % Vertical lines
 grid on;
+% Adding three more colours, so all the charts are unique
 if N > 6
     H(8).FaceColor = 'g';
     H(9).FaceColor = 'y';
@@ -193,7 +194,8 @@ end
 title('Gantt chart');
 xlabel('Processing time');
 ylabel('Job schedule');
-% Printing of the labels in the charts
+legend('Due date respected','Due date not respected', 'Location', 'southeast');
+% Printing the labels in the charts
 labelx = H(1).YEndPoints - 4.5;
 labely = H(1).XEndPoints;
 text(labelx, labely, "J" + string(scheduled(1)),'VerticalAlignment', 'middle');
