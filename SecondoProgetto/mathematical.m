@@ -1,4 +1,4 @@
-clear;
+clear all;
 clc;
 
 %% Parameters
@@ -104,6 +104,8 @@ disp(output);
 %% Gantt chart
 
 [out, idx] = sort(sol.C, 'ascend');
+
+% Creation of the matrix that we're going to plot in the Gantt chart
 ganttMatrix = zeros(nJobs,1);
 for i = 1:nJobs
     ganttMatrix(i) = P(idx(i));
@@ -118,27 +120,96 @@ end
 H = barh(1,ganttMatrix,'stacked','FaceColor','flat');
 % Display every second in the X axis
 xticks(0:1:sum(P));
-% Display red or blue lines corresponding to the due dates
-for i=1:length(D)
-    if idx(i) == 4 || idx(i) == 6
-        xl = xline(D(idx(i)),'r',"D4 & " + "     ");
-        xl.LabelHorizontalAlignment = 'left';
-        xl = xline(D(idx(i)),'--b',"D6");
-        xl.LabelHorizontalAlignment = 'left';
-        continue;
+% Computing the number of repeating due dates
+[GC,GR] = groupcounts(D');
+row = 1;
+col = 1;
+for i=1:length(GC)
+    if GC(i) > 1
+        repetitions(row,col) = GC(i);
+        repetitions(row,col+1) = GR(i);
+        row=row+1;
     end
-    if idx(i) == 9 || idx(i) == 10
-        xl = xline(D(idx(i)),'--b',"D9 & D10");
-        xl.LabelHorizontalAlignment = 'left';
-        continue;
-    end
+end
+
+% Display red or blue labels corresponding to the due dates
+count1=0;
+count2=0;
+for i=1:nJobs
+    if ismember(D(idx(i)),repetitions(1,2))
+        if count1 == 0
+            if complTime(i) > D(idx(i))
+                xl = xline(D(idx(i)),'--r',"D" + string(idx(i)) + " & " + "      ");
+                xl.LabelHorizontalAlignment = 'left';
+                count1=1;
+                continue;
+            else
+                xl = xline(D(idx(i)),'--b',"D" + string(idx(i)) + " & " + "      ");
+                xl.LabelHorizontalAlignment = 'left';
+                count1=1;
+                continue;
+            end
+        else
+            if complTime(i) > D(idx(i))
+                xl = xline(D(idx(i)),'r',"D" + string(idx(i)));
+                xl.LabelHorizontalAlignment = 'left';
+                count1=0;
+                continue;
+            else
+                xl = xline(D(idx(i)),'b',"D" + string(idx(i)));
+                xl.LabelHorizontalAlignment = 'left';
+                count1=0;
+                continue;
+            end                
+        end         
+    end 
+        
+     if ismember(D(idx(i)),repetitions(2,2))
+        if count2 == 0
+            if complTime(i) > D(idx(i))
+                xl = xline(D(idx(i)),'--r',"D" + string(idx(i)) + " & " + "      ");
+                xl.LabelHorizontalAlignment = 'left';
+                count2=1;
+                continue;
+            else
+                xl = xline(D(idx(i)),'--b',"D" + string(idx(i)) + " & " + "      ");
+                xl.LabelHorizontalAlignment = 'left';
+                count2=1;
+                continue;
+            end
+        else
+            if complTime(i) > D(idx(i))
+                xl = xline(D(idx(i)),'r',"D" + string(idx(i)));
+                xl.LabelHorizontalAlignment = 'left';
+                count2=0;
+                continue;
+            else
+                xl = xline(D(idx(i)),'b',"D" + string(idx(i)));
+                xl.LabelHorizontalAlignment = 'left';
+                count2=0;
+                continue;
+            end                
+        end  
+     end
+          
     if complTime(i) > D(idx(i))
         xl = xline(D(idx(i)),'--r',"D" + string(idx(i)));
         xl.LabelHorizontalAlignment = 'left';
+        continue;
     else
         xl = xline(D(idx(i)),'--b',"D" + string(idx(i)));
         xl.LabelHorizontalAlignment = 'left';
+        continue;
     end
+end
+
+% Vertical lines
+grid on;
+% Adding three more colours, so all the charts are unique
+if nJobs > 6
+      H(8).CData = [0 1 0];
+      H(9).CData = [1 1 0.5];
+      H(10).CData = [1 0.5 0.5];
 end
 % Vertical lines
 grid on;
@@ -162,4 +233,3 @@ for i = 1:nJobs
         text(labelx, labely, "J" + string(idx(i+1)),'VerticalAlignment', 'middle');
     end
 end
-

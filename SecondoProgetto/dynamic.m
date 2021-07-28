@@ -137,7 +137,7 @@ end
 scheduled(1) = path{1};
 
 % Completion time definition
-completionTime = zeros(N,1);
+
 temp = 0;
 for i=1:N
     completionTime(i) = temp + P(scheduled(i));
@@ -159,8 +159,8 @@ H = barh(1,ganttMatrix,'stacked','FaceColor','flat');
 
 % Display every second in the X axis
 xticks(0:1:sum(P));
-% Display red or blue lines corresponding to the due dates
 
+% Computing the number of repeating due dates
 [GC,GR] = groupcounts(D);
 row = 1;
 col = 1;
@@ -172,6 +172,7 @@ for i=1:length(GC)
     end
 end
 
+% Display red or blue labels corresponding to the due dates
 count1=0;
 count2=0;
 for i=1:N
@@ -242,27 +243,6 @@ for i=1:N
     end
 end
 
-% for i=1:N
-%     if scheduled(i) == 4 || scheduled(i) == 6
-%         xl = xline(D(scheduled(i)),'--r',"D4 & D6");
-%         xl.LabelHorizontalAlignment = 'left';
-%         continue;
-%     end
-%     if scheduled(i) == 9 || scheduled(i) == 10
-%         xl = xline(D(scheduled(i)),'r',"D9 & " + "       ");
-%         xl.LabelHorizontalAlignment = 'left';
-%         xl = xline(D(scheduled(i)),'--b',"D10");
-%         xl.LabelHorizontalAlignment = 'left';
-%         continue;
-%     end
-%     if completionTime(i) > D(scheduled(i))
-%         xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)));
-%         xl.LabelHorizontalAlignment = 'left';
-%     else
-%         xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)));
-%         xl.LabelHorizontalAlignment = 'left';
-%     end
-% end
 % Vertical lines
 grid on;
 % Adding three more colours, so all the charts are unique
