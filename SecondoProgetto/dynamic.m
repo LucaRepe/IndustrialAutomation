@@ -7,10 +7,11 @@ clc;
 J = [1 2 3 4 5 6 7 8 9 10]';
 
 % Defining the processing times
+% P = [5 3 6 8 4 12 12 5 3 2]';
 P = [5 3 6 8 4 12 12 5 3 2]';
 
 % Defining the due dates
-D = [12 60 16 15 9 15 32 20 18 18]'; % 10 6 8 7
+D = [12 60 16 15 9 15 32 20 18 18]';
 
 % Defining the weights
 W = [1 1 1 1.5 1 1 2 1 1.2 3]';
@@ -115,17 +116,15 @@ for k=N-1:-1:1
 end
 
 % Step 0
-G0 = zeros(1,length(X{1}));
 for i=1:length(X{1})
     G0(i)=Go{1}(i)+max((P(X{1}(i))-D(X{1}(i))), 0);
 end
 
 [Go0, index]=min(G0); % add the storage of the optimal control
-path{1} = X{1}(index, :); % cell of list of execution
+path{1} = X{1}(index, :); % cell array of the list of execution
 
 %% Forward phase
 
-path{N} = zeros(N);
 for i=2:N
     [value, index] = min(Go{i});
     path{i} = X{i}(index, :);
@@ -150,51 +149,103 @@ end
 clf;
 close all;
 
-% Creation of the matrix that we're going
-% to plot in the Gantt chart
+% Creation of the matrix that we're going to plot in the Gantt chart
 ganttMatrix = zeros(N,1);
 for i = 1:length(P)
     ganttMatrix(i) = P(scheduled(i));
 end
 
-H = barh(1,ganttMatrix,'stacked');
+H = barh(1,ganttMatrix,'stacked','FaceColor','flat');
 
 % Display every second in the X axis
 xticks(0:1:sum(P));
 % Display red or blue lines corresponding to the due dates
-for i=1:length(D)
-    if scheduled(i) == 4 || scheduled(i) == 6
-        xl = xline(D(scheduled(i)),'--r',"D4 & D6");
-        xl.LabelHorizontalAlignment = 'left';
-        continue;
-    end
-    if scheduled(i) == 9 || scheduled(i) == 10
-        xl = xline(D(scheduled(i)),'--b',"D9 & " + "       ");
-        xl.LabelHorizontalAlignment = 'left';
-        xl = xline(D(scheduled(i)),'--r',"D10");
-        xl.LabelHorizontalAlignment = 'left';
-        continue;
-    end
-    if completionTime(i) > D(scheduled(i))
-        xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)));
-        xl.LabelHorizontalAlignment = 'left';
-    else
-        xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)));
-        xl.LabelHorizontalAlignment = 'left';
+
+[GC,GR] = groupcounts(D);
+row = 1;
+col = 1;
+for i=1:length(GC)
+    if GC(i) > 1
+        repetitions(row,col) = GC(i);
+        repetitions(row,col+1) = GR(i);
+        repetitions(row,col+2) = 0;
+        row=row+1;
     end
 end
+
+count1=0;
+count2=0;
+for i=1:N
+    if ismember(D(scheduled(i)),repetitions(1,2))
+        if count1 == 0
+            if completionTime(i) > D(scheduled(i))
+                xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)) + " & " + "      ");
+                xl.LabelHorizontalAlignment = 'left';
+                count1=1;
+            else
+                xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)) + " & " + "      ");
+                xl.LabelHorizontalAlignment = 'left';
+                count1=1;
+            end
+        else
+            if completionTime(i) > D(scheduled(i))
+                xl = xline(D(scheduled(i)),'r',"D" + string(scheduled(i)));
+                xl.LabelHorizontalAlignment = 'left';
+                count1=0;
+            else
+                xl = xline(D(scheduled(i)),'b',"D" + string(scheduled(i)));
+                xl.LabelHorizontalAlignment = 'left';
+                count1=0;
+            end                
+        end         
+    else
+        
+        
+        
+        
+        
+        if completionTime(i) > D(scheduled(i))
+            xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)));
+            xl.LabelHorizontalAlignment = 'left';
+        else
+            xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)));
+            xl.LabelHorizontalAlignment = 'left';
+        end
+    end
+end
+
+% for i=1:N
+%     if scheduled(i) == 4 || scheduled(i) == 6
+%         xl = xline(D(scheduled(i)),'--r',"D4 & D6");
+%         xl.LabelHorizontalAlignment = 'left';
+%         continue;
+%     end
+%     if scheduled(i) == 9 || scheduled(i) == 10
+%         xl = xline(D(scheduled(i)),'r',"D9 & " + "       ");
+%         xl.LabelHorizontalAlignment = 'left';
+%         xl = xline(D(scheduled(i)),'--b',"D10");
+%         xl.LabelHorizontalAlignment = 'left';
+%         continue;
+%     end
+%     if completionTime(i) > D(scheduled(i))
+%         xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)));
+%         xl.LabelHorizontalAlignment = 'left';
+%     else
+%         xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)));
+%         xl.LabelHorizontalAlignment = 'left';
+%     end
+% end
 % Vertical lines
 grid on;
 % Adding three more colours, so all the charts are unique
 if N > 6
-    H(8).FaceColor = 'g';
-    H(9).FaceColor = 'y';
-    H(10).FaceColor = 'b';
+      H(8).CData = [0 1 0];
+      H(9).CData = [1 1 0.5];
+      H(10).CData = [1 0.5 0.5];
 end
 title('Gantt chart');
 xlabel('Processing time');
 ylabel('Job schedule');
-legend('Due date respected','Due date not respected', 'Location', 'southeast');
 % Printing the labels in the charts
 labelx = H(1).YEndPoints - 4.5;
 labely = H(1).XEndPoints;

@@ -10,7 +10,7 @@ J = [1 2 3 4 5 6 7 8 9 10];
 P = [5 3 6 8 4 12 12 5 3 2];
 
 % Defining the due dates
-D = [12 60 16 15 9 15 32 20 18 18]; % 4 6 3 9 8 10 7 
+D = [12 60 16 15 9 15 32 20 18 18];
 
 % Defining the weights
 W = [1 1 1 1.5 1 1 2 1 1.2 3];
@@ -52,33 +52,33 @@ prob.Constraints.completionTime = completionTime;
 % Big-M one job at a time
 
 count = 1;
-bigM = optimconstr (nJobs*nJobs);
+bigMconstr = optimconstr (nJobs*nJobs);
 
 for i=1:nJobs
     for j=1:nJobs
         if i~=j
-            bigM(count) = S(j) >= C(i) - M*(1-X(i,j));
-            bigM(count+1) = S(i) >= C(j) - M*(X(i,j));
+            bigMconstr(count) = S(j) >= C(i) - M*(1-X(i,j));
+            bigMconstr(count+1) = S(i) >= C(j) - M*(X(i,j));
             count = count+2;
         end
     end
 end
 
-prob.Constraints.bigM = bigM;
+prob.Constraints.bigMconstr = bigMconstr;
 
-% J1 before J3
+% Job 1 before Job 3
 
-job1before3constr = optimconstr(nMachines);
-job1before3constr = S(3) >= C(1);
+j1beforej3constr = optimconstr(nMachines);
+j1beforej3constr = S(3) >= C(1);
 
-prob.Constraints.job1before3constr = job1before3constr;
+prob.Constraints.j1beforej3constr = j1beforej3constr;
 
 % J9 before J10
 
-job9before10constr = optimconstr(nMachines);
-job9before10constr = S(10) >= C(9);
+j9beforej10constr = optimconstr(nMachines);
+j9beforej10constr = S(10) >= C(9);
 
-prob.Constraints.job9before10constr = job9before10constr;
+prob.Constraints.j9beforej10constr = j9beforej10constr;
 
 
 %% Tardiness
@@ -115,15 +115,15 @@ for i=1:nJobs
     complTime(i) = temp + P(idx(i));
     temp = complTime(i);
 end
-H = barh(1,ganttMatrix,'stacked');
+H = barh(1,ganttMatrix,'stacked','FaceColor','flat');
 % Display every second in the X axis
 xticks(0:1:sum(P));
-% Display red lines corresponding to the due dates
+% Display red or blue lines corresponding to the due dates
 for i=1:length(D)
     if idx(i) == 4 || idx(i) == 6
-        xl = xline(D(idx(i)),'--b',"D4 & " + "     ");
+        xl = xline(D(idx(i)),'r',"D4 & " + "     ");
         xl.LabelHorizontalAlignment = 'left';
-        xl = xline(D(idx(i)),'--r',"D6");
+        xl = xline(D(idx(i)),'--b',"D6");
         xl.LabelHorizontalAlignment = 'left';
         continue;
     end
@@ -144,14 +144,13 @@ end
 grid on;
 % Adding three more colours, so all the charts are unique
 if nJobs > 6
-    H(8).FaceColor = 'g';
-    H(9).FaceColor = 'y';
-    H(10).FaceColor = 'b';
+      H(8).CData = [0 1 0];
+      H(9).CData = [1 1 0.5];
+      H(10).CData = [1 0.5 0.5];
 end
 title('Gantt chart');
 xlabel('Processing time');
 ylabel('Job schedule');
-legend('Due date respected','Due date not respected', 'Location', 'southeast');
 % Printing the labels in the charts
 labelx = H(1).YEndPoints - 3.5;
 labely = H(1).XEndPoints;
