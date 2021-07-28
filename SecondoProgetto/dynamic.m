@@ -8,7 +8,7 @@ J = [1 2 3 4 5 6 7 8 9 10]';
 
 % Defining the processing times
 % P = [5 3 6 8 4 12 12 5 3 2]';
-P = [5 3 6 8 4 12 12 5 3 2]';
+  P = [5 3 6 8 4 12 12 5 3 2]';
 
 % Defining the due dates
 D = [12 60 16 15 9 15 32 20 18 18]';
@@ -120,8 +120,8 @@ for i=1:length(X{1})
     G0(i)=Go{1}(i)+max((P(X{1}(i))-D(X{1}(i))), 0);
 end
 
-[Go0, index]=min(G0); % add the storage of the optimal control
-path{1} = X{1}(index, :); % cell array of the list of execution
+[Go0, index1]=min(G0); % add the storage of the optimal control
+path{1} = X{1}(index1, :); % cell array of the list of execution
 
 %% Forward phase
 
@@ -168,7 +168,6 @@ for i=1:length(GC)
     if GC(i) > 1
         repetitions(row,col) = GC(i);
         repetitions(row,col+1) = GR(i);
-        repetitions(row,col+2) = 0;
         row=row+1;
     end
 end
@@ -182,35 +181,64 @@ for i=1:N
                 xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)) + " & " + "      ");
                 xl.LabelHorizontalAlignment = 'left';
                 count1=1;
+                continue;
             else
                 xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)) + " & " + "      ");
                 xl.LabelHorizontalAlignment = 'left';
                 count1=1;
+                continue;
             end
         else
             if completionTime(i) > D(scheduled(i))
                 xl = xline(D(scheduled(i)),'r',"D" + string(scheduled(i)));
                 xl.LabelHorizontalAlignment = 'left';
                 count1=0;
+                continue;
             else
                 xl = xline(D(scheduled(i)),'b',"D" + string(scheduled(i)));
                 xl.LabelHorizontalAlignment = 'left';
                 count1=0;
+                continue;
             end                
         end         
-    else
+    end 
         
-        
-        
-        
-        
-        if completionTime(i) > D(scheduled(i))
-            xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)));
-            xl.LabelHorizontalAlignment = 'left';
+     if ismember(D(scheduled(i)),repetitions(2,2))
+        if count2 == 0
+            if completionTime(i) > D(scheduled(i))
+                xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)) + " & " + "      ");
+                xl.LabelHorizontalAlignment = 'left';
+                count2=1;
+                continue;
+            else
+                xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)) + " & " + "      ");
+                xl.LabelHorizontalAlignment = 'left';
+                count2=1;
+                continue;
+            end
         else
-            xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)));
-            xl.LabelHorizontalAlignment = 'left';
-        end
+            if completionTime(i) > D(scheduled(i))
+                xl = xline(D(scheduled(i)),'r',"D" + string(scheduled(i)));
+                xl.LabelHorizontalAlignment = 'left';
+                count2=0;
+                continue;
+            else
+                xl = xline(D(scheduled(i)),'b',"D" + string(scheduled(i)));
+                xl.LabelHorizontalAlignment = 'left';
+                count2=0;
+                continue;
+            end                
+        end  
+     end
+          
+    if completionTime(i) > D(scheduled(i))
+        xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)));
+        xl.LabelHorizontalAlignment = 'left';
+        continue;
+    else
+        xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)));
+        xl.LabelHorizontalAlignment = 'left';
+        continue;
     end
 end
 
