@@ -7,8 +7,7 @@ clc;
 J = [1 2 3 4 5 6 7 8 9 10]';
 
 % Defining the processing times
-% P = [5 3 6 8 4 12 12 5 3 2]';
-  P = [5 3 6 8 4 12 12 5 3 2]';
+P = [5 3 6 8 4 12 12 5 3 2]';
 
 % Defining the due dates
 D = [12 60 16 15 9 15 32 20 18 18]';
@@ -16,15 +15,13 @@ D = [12 60 16 15 9 15 32 20 18 18]';
 % Defining the weights
 W = [1 1 1 1.5 1 1 2 1 1.2 3]';
 
+N = length(J);
 % Defining the matrix of precedences
-precedences = zeros(10,10);
+precedences = zeros(N,N);
 precedences(1,3) = 1;
 precedences(9,10) = 1;
 
-% Defining the stages
-N = length(J);
 X0 = 0;
-
 % Cell array with all the possible states in the stages
 for i = 1:N   
     X{i} = nchoosek(1:N,i);
@@ -50,7 +47,6 @@ end
 % if it's verified then is admissible.
 
 % Loop to prune the other stages
-
 for c=2:N
     j=1;
     % Loop with all the possible states in the c-th stage
@@ -95,15 +91,15 @@ X = Y;
 %% Backward phase
 
 % Step N
-states(N)=length(X{N}(:,1));
-Go{N}=0; % cost at each state
+states(N)=length(X{N}(:,1)); % insert the number of states present at stage N
+Go{N}=0; % matrix with the optimal costs
 
 % Steps from N-1 to 1
 for k=N-1:-1:1
     states(k)=length(X{k}(:,1));
     G{k}=10000*ones(states(k),states(k+1)); % cost matrix
     for i=1:states(k)
-        start_time=sum(P(X{k}(i,:))); % sum of all the p of the job listed
+        start_time=sum(P(X{k}(i,:))); % sum of the processing times of the jobs listed
         for j=1:states(k+1)
             if ismember(X{k}(i,:),X{k+1}(j,:)) % control to check if the state is reachable
                 control(i,j)=setdiff(X{k+1}(j,:),X{k}(i,:)); % job to compute the tardiness
@@ -117,19 +113,22 @@ end
 
 % Step 0
 for i=1:length(X{1})
-    G0(i)=Go{1}(i)+max((P(X{1}(i))-D(X{1}(i))), 0);
+    G0(i)=Go{1}(i)+max((P(X{1}(i))-D(X{1}(i))), 0)*W(i);
 end
 
-[Go0, index1]=min(G0); % add the storage of the optimal control
-path{1} = X{1}(index1, :); % cell array of the list of execution
+% Go0 is the optimal cost
+[Go0, index]=min(G0); 
 
 %% Forward phase
 
+path{1} = X{1}(index, :);
+% Computing the path searching the minimum of Go in every position
 for i=2:N
     [value, index] = min(Go{i});
     path{i} = X{i}(index, :);
 end
 
+% Find the scheduling of the jobs by looking at the path
 scheduled = zeros(N,1);
 for i=N:-1:2
     scheduled(i) = setdiff(path{i}, path{i-1});
@@ -137,7 +136,6 @@ end
 scheduled(1) = path{1};
 
 % Completion time definition
-
 temp = 0;
 for i=1:N
     completionTime(i) = temp + P(scheduled(i));
@@ -191,12 +189,12 @@ for i=1:N
             end
         else
             if completionTime(i) > D(scheduled(i))
-                xl = xline(D(scheduled(i)),'r',"D" + string(scheduled(i)));
+                xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)));
                 xl.LabelHorizontalAlignment = 'left';
                 count1=0;
                 continue;
             else
-                xl = xline(D(scheduled(i)),'b',"D" + string(scheduled(i)));
+                xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)));
                 xl.LabelHorizontalAlignment = 'left';
                 count1=0;
                 continue;
@@ -219,12 +217,12 @@ for i=1:N
             end
         else
             if completionTime(i) > D(scheduled(i))
-                xl = xline(D(scheduled(i)),'r',"D" + string(scheduled(i)));
+                xl = xline(D(scheduled(i)),'--r',"D" + string(scheduled(i)));
                 xl.LabelHorizontalAlignment = 'left';
                 count2=0;
                 continue;
             else
-                xl = xline(D(scheduled(i)),'b',"D" + string(scheduled(i)));
+                xl = xline(D(scheduled(i)),'--b',"D" + string(scheduled(i)));
                 xl.LabelHorizontalAlignment = 'left';
                 count2=0;
                 continue;

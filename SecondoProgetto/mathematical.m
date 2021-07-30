@@ -151,12 +151,12 @@ for i=1:nJobs
             end
         else
             if complTime(i) > D(idx(i))
-                xl = xline(D(idx(i)),'r',"D" + string(idx(i)));
+                xl = xline(D(idx(i)),'--r',"D" + string(idx(i)));
                 xl.LabelHorizontalAlignment = 'left';
                 count1=0;
                 continue;
             else
-                xl = xline(D(idx(i)),'b',"D" + string(idx(i)));
+                xl = xline(D(idx(i)),'--b',"D" + string(idx(i)));
                 xl.LabelHorizontalAlignment = 'left';
                 count1=0;
                 continue;
@@ -179,12 +179,12 @@ for i=1:nJobs
             end
         else
             if complTime(i) > D(idx(i))
-                xl = xline(D(idx(i)),'r',"D" + string(idx(i)));
+                xl = xline(D(idx(i)),'--r',"D" + string(idx(i)));
                 xl.LabelHorizontalAlignment = 'left';
                 count2=0;
                 continue;
             else
-                xl = xline(D(idx(i)),'b',"D" + string(idx(i)));
+                xl = xline(D(idx(i)),'--b',"D" + string(idx(i)));
                 xl.LabelHorizontalAlignment = 'left';
                 count2=0;
                 continue;
